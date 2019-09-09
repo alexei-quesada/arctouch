@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reports{% endblock %}
+
+{% block body %}
+<div class="row text-center pt-5">
+    <div class="col-12">
+        <h1>Attendee Report</h1>
+    </div>
+</div>
+<div class="row pb-5 pt-4">
+    <div class="col-12">
+        <div class="accordion" id="reportOfUsers">
+        {% for user in users %}
+         {% if user.hasEvents %}
+        <div class="card">  
+            <div class="card-header" id="{{'listOfUsers'~loop.index}}">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-link-green" type="button" data-toggle="collapse" data-target="{{'#collapse'~loop.index}}" aria-expanded="true" aria-controls="{{'collapse'~loop.index}}">
+                    <span>{{ user.name ~ " - "}}</span>
+                    <span>{{ user.email }}</span>
+                    </button>
+                </h2>
+            </div>       
+            <div id="{{'collapse'~loop.index}}" class="collapse" aria-labelledby="{{'listOfUsers'~loop.index}}" data-parent="#reportOfUsers">
+                <div class="card-body">
+                        <h3 class="">Events</h3>
+                        <ul class="list-group">
+                            {% for event in user.events %}
+                                <li class="list-group-item">{{ event.name}}</li>
+                            {% endfor %}
+                        </ul>
+                </div>
+            </div>       
+        </div>
+         {% endif %}
+        {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

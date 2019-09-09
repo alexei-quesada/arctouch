@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">	
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css">
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        <div class="site-container">
+        <header>
+            <div class="container d-flex pt-2 pb-2">
+                <h1 class="site-name align-self-center order-2"><a href="{{ path('home') }}">RSVP EVENT</a></h1>
+                <nav class="navbar navbar-expand-lg order-1 align-self-center px-0 py-3">                
+                    <button class="navbar-toggler p-0" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">    
+                        <div class="top-header-navbar d-flex py-4 d-lg-none">                    
+                            <button type="button" class="btn-close-navbar px-3" aria-label="Close">
+                                <svg class="close-icon" viewBox="0 0 512 512" width="20" height="20" style="">
+                                    <path d="M505.943,6.058c-8.077-8.077-21.172-8.077-29.249,0L6.058,476.693c-8.077,8.077-8.077,21.172,0,29.249C10.096,509.982,15.39,512,20.683,512c5.293,0,10.586-2.019,14.625-6.059L505.943,35.306C514.019,27.23,514.019,14.135,505.943,6.058z"/>
+                                    <path d="M505.942,476.694L35.306,6.059c-8.076-8.077-21.172-8.077-29.248,0c-8.077,8.076-8.077,21.171,0,29.248l470.636,470.636c4.038,4.039,9.332,6.058,14.625,6.058c5.293,0,10.587-2.019,14.624-6.057C514.018,497.866,514.018,484.771,505.942,476.694z"/>
+                                </svg>
+                            </button>
+                            <h1 class="site-name"><a href="{{ path('home') }}">RSVP EVENT</a></h1>
+                        </div>
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item {{ app.request.get('_route') == 'home' ? 'active' }}">
+                                <a class="nav-link" href="{{path('home')}}">HOME <span class="sr-only">(current)</span></a>
+                            </li>
+                            <li class="nav-item {{ app.request.get('_route') == 'event.index' ? 'active' }}">
+                                <a class="nav-link " href="{{path('event.index')}}">EVENTS</a>
+                            </li>
+                            <li class="nav-item {{ app.request.get('_route') == 'contact.index' ? 'active' }}">
+                                <a class="nav-link" href="{{ path('contact.index') }}">CONTACT</a>
+                            </li>
+                            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                <li class="nav-item {{ app.request.get('_route') == 'report.index' ? 'active' }}">
+                                    <a class="nav-link" href="{{ path('report.index') }}">REPORTS</a>
+                                </li>
+                                {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{path('app_logout')}}">LOGOUT</a>
+                            </li>
+                            {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="#!" data-toggle="modal" data-target="#exampleModalCenter">LOGIN</a>
+                            </li>
+                             {% endif %}
+                        </ul>
+                        <div class="bottom-navbar py-3 d-lg-none">                    
+                            <ul class="d-flex justify-content-center m-0 p-0">
+                                <li class="mr-4">
+                                    <a href="https://www.facebook.com/" title="RSVP EVENT on Facebook" >
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                </li>
+                                <li class="mr-4">
+                                    <a href="https://twitter.com/" title="RSVP EVENT on Twitter" >
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                </li>                        
+                                <li>
+                                    <a href="https://www.instagram.com/" title="RSVP EVENT on Instagram" >
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                </li>     
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+        <main>
+            <div class="container">
+                {% block body %}{% endblock %}
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                <div class="modal-header pb-0">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="login-tab" data-toggle="tab" href="#login-form" role="tab" aria-controls="login-form" aria-selected="true">Sign in</a>
+                        </li>
+                    </ul>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body ">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="login-form" role="tabpanel" aria-labelledby="login-tab">
+                            <form method="post">                             
+                                <div class="form-group">
+                                    <label for="inputEmail" class="sr-only">Email</label>
+                                    <input type="email" value="" name="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword" class="sr-only">Password</label>
+                                    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                                </div>
+
+                                <input type="hidden" name="_csrf_token"
+                                    value="{{ csrf_token('authenticate') }}">
+                                <div class="d-flex justify-content-between">
+                                <div class="checkbox mb-3">
+                                    <label>
+                                        <input type="checkbox" name="_remember_me"> Remember me
+                                    </label>
+                                </div>
+                                <div class="mb-3">
+                                    <a href="{{path('register')}}">Create an account </a>
+                                </div>
+                                </div>
+                                <button class="btn btn-lg btn-primary-green" type="submit">
+                                    Sign in
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>                    
+                </div>                
+                </div>
+            </div>
+            </div>
+        </main>         
+        <footer>
+            <div class="container d-flex flex-wrap align-items-center">
+                <div class="footer-logo pl-0 py-4">
+                    <h1 class="site-name mb-0"><a href="{{ path('home') }}">RSVP EVENT</a></h1>
+                </div> 
+                <div class="footer-social py-4">
+                    <ul class="d-flex justify-content-center mb-0">
+                        <li class="mr-4">
+                            <a href="https://www.facebook.com/" title="RSVP EVENT on Facebook" >
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                        </li>
+                        <li class="mr-4">
+                            <a href="https://twitter.com/" title="RSVP EVENT on Twitter" >
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </li>                        
+                        <li>
+                            <a href="https://www.instagram.com/" title="RSVP EVENT on Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </li>     
+                    </ul>
+                </div> 
+                <div class="footer-copyright d-flex justify-content-end py-4 px-2">
+                    <p class="mb-0">© 2019 All rights reserved.</p>
+                </div>                   
+            </div>
+        </footer> 
+        </div> 
+         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="{{ asset('assets/js/scripts.js') }}"></script>
+    {% block javascripts %}{% endblock %}
+    </body>
+</html>

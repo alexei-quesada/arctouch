@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ event.name }}{% endblock %}
+
+{% block body %}    
+    <div class="row text-center pt-5 single-event">
+        <div class="col-12">
+            <div class="info d-flex">
+                <div class="date-event d-flex flex-column justify-content-center mr-1">
+                    <span>{{ event.date|date("d") }}</span>
+                    <span>{{ event.date|date("M")|upper }}</span>
+                </div>
+                <div class="content-title-event text-left pl-4">
+                    <h1>{{ event.name}}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 mt-5 mb-4">
+            <div class="image-container" style="background-image:url({{asset('assets/images/'~event.image)}})"></div>
+        </div>
+        <div class="col-12 text-left">
+            <p>{{ event.description }}</p>
+        </div>
+         <div class="col-12 text-left mb-3">
+            <h3 class="mb-3">Event Location: <span id="location"></span></h3>
+            <div id="map"></div>
+        </div>
+        <div class="col-12 text-left">
+            <h3 class="mb-3">List of attenders:</h3>
+            <ul class="list-attenders d-flex">
+                {% for user in event.attendees %}
+                    <li class="pr-3 green-text">{{ user.name|e }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>    
+    <div class="row pt-5 pb-5">    
+        <div class="col-12">
+            <div class="alert alert-success alert-dismissible fade d-none show">
+                <strong>Congratulations!</strong> You have joined the event.
+                <button type="button" class="close c-alert-success" >&times;</button>
+            </div>
+            <div class="alert alert-danger alert-dismissible fade d-none show">
+                <strong>Wait!</strong> You need to login first.
+                <button type="button" class="close c-alert-danger" >&times;</button>
+            </div>
+            <div class="alert alert-warning alert-dismissible fade d-none show">
+                <strong>So sad!</strong> You are to far from the event.
+                <button type="button" class="close c-alert-warning">&times;</button>
+            </div>
+            <button class="btn btn-lg btn-primary-green btn-join-event {% if is_granted('ROLE_USER') and app.user.isInEvent(event) %} button-disabled {% endif %}" {% if is_granted('ROLE_USER') and app.user.isInEvent(event) %} disabled {% endif %}   {% if is_granted('ROLE_USER') %} onclick="requestJoin()" {% else %}  onclick="needAuth()" {% endif %} type="button">Join the event</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+        <script type="text/javascript">
+            var stringCoordinates = '{{ event.location }}';
+            var arrayCoordinates = stringCoordinates.split(",");
+            $(".c-alert-success").on("click", function(){
+                $(".alert-success").addClass("d-none"); 
+            })
+            $(".c-alert-danger").on("click", function(){
+                $(".alert-danger").addClass("d-none"); 
+            })
+            $(".c-alert-warning").on("click", function(){
+                $(".alert-warning").addClass("d-none"); 
+            })
+
+            function initMap() {
+                var eventLocation = {lat: parseFloat(arrayCoordinates[0]), lng: parseFloat(arrayCoordinates[1])};
+                var map = new google.maps.Map(
+                    document.getElementById('map'), {zoom: 14, center: eventLocation});
+                var marker = new google.maps.Marker({position: eventLocation, map: map});
+
+                 var geocoder = new google.maps.Geocoder;
+                geocoder.geocode({'location': eventLocation}, function(results, status) {
+                    if (status === 'OK') {
+                        if (results[0]) {
+                            document.getElementById('location').innerHTML = results[0].formatted_address;
+                        }
+                    }
+                });
+            }
+
+            function requestJoin(){
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(ajaxRequest);
+                }
+            }
+           
+            function ajaxRequest(userLocation) {
+                let userId =  {% if is_granted('ROLE_USER') %} '{{ app.user.id }}' {% else %} '-1' {% endif %};
+                let path = '{{ path('event.join', {'slug':event.slug}) }}';
+                let parameters = {'userId': userId, 'userLocation': {'lat':userLocation.coords.latitude,'lon':userLocation.coords.longitude}};
+
+                $.ajax({
+                    url: path,
+                    method: "POST",
+                    data: parameters,
+                    dataType: "json",
+                    success: function(response) {
+                        if(response.data === true){
+                            $(".alert-success").removeClass("d-none"); 
+                            $(".btn-join-event").attr("disabled",true);
+                            $(".btn-join-event").addClass("button-disabled");
+                            {% if is_granted('ROLE_USER') %}
+                                $(".list-attenders").append('<li class="pr-3 green-text">{{ app.user.name }}</li>')
+                            {% endif %}
+
+                        } else
+                            $(".alert-warning").removeClass("d-none");                        
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+
+                    }
+                });
+            }
+            
+          function needAuth() {
+              $(".alert-danger").removeClass("d-none"); 
+          }
+
+        </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJ_K4c6-gCt4jo5Hatf5gLpx0L5m3HcAk&callback=initMap">
+    </script>
+
+{% endblock %}

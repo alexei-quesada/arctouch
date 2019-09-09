@@ -1,0 +1,38 @@
+{% extends('base.html.twig') %}
+
+ {% block body %}
+ <div class="row text-center pt-5">
+    <div class="col-12">
+        <h1 class="">The main events are coming</h1>
+        <p class="subtitles">Check the upcoming events in the upcoming days</p> 
+    </div>
+ </div>
+ <div class="row pt-4">
+     {% for event in events %}
+         <div class="col-md-4 col-sm-6 mb-3">
+             <div class="card">
+                 <div class="image-container" style="background-image:url({{asset('assets/images/'~event.image)}})"></div>
+                 <div class="card-body">
+                     <div class="info d-flex">
+                         <div class="date d-flex flex-column justify-content-center mr-1">
+                             <span>{{ event.date|date("d") }}</span>
+                             <span>{{ event.date|date("M")|upper }}</span>
+                         </div>
+                         <div class="content-card">
+                             <h3 class="card-title"><a href="{{ path('event.show', {'slug':event.slug}) }}">{{ event.name}}</a></h3>
+                             <p class="card-text">{{ event.description [:90] ~ '...'  }}</p>
+                         </div>
+                     </div>
+                     <a href="{{ path('event.show', {'slug':event.slug}) }}" class="btn-read-more d-flex justify-content-end mt-4">READ MORE</a>
+                 </div>
+             </div>
+         </div>
+     {% endfor %}
+ </div>
+  <div class="row text-center pt-3 pb-4">
+    <div class="col-12">
+        <a href="{{ path('event.index') }}"><button class="btn btn-lg btn-primary-green" type="button">See all the events</button></a>
+    </div>
+ </div>
+
+{% endblock %}
